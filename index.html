@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Misi Pabrik Cerdas: Koding dan Kecerdasan Artifisial</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0a1a2b;font-family:Segoe UI,Arial,sans-serif}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+#st{background:#f4f8fb;color:#10253a;display:flex;flex-direction:column;position:relative;overflow:hidden}
+#top{background:#0f2a43;color:#fff;display:flex;align-items:center;gap:.6em;padding:.4em .8em;min-height:2.8em}
+#top b{flex:1;font-size:1em}
+button{font:inherit;cursor:pointer;border:0;border-radius:.5em;padding:.5em 1em;min-height:2.4em;background:#0b6bcb;color:#fff;font-weight:600}
+button:hover{background:#0956a5}button:disabled{background:#8896a5;cursor:not-allowed}
+button.nv{background:#1d4a73}button.sc{background:#fff;color:#0b4a8f;border:2px solid #0b6bcb}
+button.ac{background:#c77d00}
+#v{flex:1;padding:1em 1.6em;overflow:auto;display:flex;flex-direction:column;gap:.7em}
+h1{font-size:2em;line-height:1.15}h2{font-size:1.45em}p,li{line-height:1.45}
+.row{display:flex;gap:.8em;align-items:stretch;flex-wrap:wrap}
+.card{background:#fff;border:2px solid #c9d9e8;border-radius:.8em;padding:.8em 1em}
+.hero{display:flex;gap:1.6em;align-items:center;flex:1}
+.hero>div:first-child{flex:1.3;display:flex;flex-direction:column;gap:.7em}
+.art{flex:1;font-size:6em;text-align:center;background:#e3effa;border-radius:1em;padding:.2em}
+.pm{font-style:italic;color:#0b4a8f;font-weight:600}
+.lv{display:grid;grid-template-columns:repeat(5,1fr);gap:.8em}
+.lv button{display:flex;flex-direction:column;gap:.3em;align-items:center;padding:1em .4em;background:#fff;color:#10253a;border:2px solid #0b6bcb}
+.lv button.done{background:#e1f5e8;border-color:#137a3a}.lv button:disabled{background:#e4e8ec;color:#5a6672;border-color:#aab4be}
+.hd{display:flex;gap:1em;align-items:center;font-weight:700}
+.hd .bar{flex:1;height:.8em;background:#d5e0ea;border-radius:1em;overflow:hidden}.bar i{display:block;height:100%;background:#137a3a}
+#fb{min-height:2.8em;border-radius:.6em;padding:.5em .9em;font-weight:600;border:2px solid transparent}
+#fb.ok{background:#dff5e6;border-color:#137a3a;color:#0b4d24}#fb.bad{background:#fde7e5;border-color:#b3261e;color:#7a120c}#fb.in{background:#e9f1f9;border-color:#9bb7d3}
+.sl{display:flex;gap:.6em;align-items:center;padding:.4em .7em;border:2px dashed #9bb7d3;border-radius:.5em;min-height:2.4em;background:#fff}
+.sl.f{border-style:solid;border-color:#137a3a;background:#e1f5e8}
+.opt{background:#fff;color:#10253a;border:2px solid #0b6bcb;text-align:left}
+.opt.sel{background:#ffe9b3;border-color:#c77d00}.opt.dn{background:#e1f5e8;border-color:#137a3a;color:#0b4d24}
+.bx{display:inline-block;width:1.7em;height:1.7em;background:#c77d00;border:2px solid #7a4b00;border-radius:.2em;margin:.1em}
+select,input[type=number]{font:inherit;padding:.3em .5em;border:2px solid #0b6bcb;border-radius:.4em;min-height:2.2em}
+input[type=range]{width:14em}
+table{border-collapse:collapse}td,th{border:2px solid #c9d9e8;padding:.3em .8em;text-align:center}
+.ov{position:absolute;inset:0;background:rgba(10,26,43,.85);display:flex;align-items:center;justify-content:center;z-index:5}
+.ov .card{max-width:32em;text-align:center;display:flex;flex-direction:column;gap:.7em}
+.big{font-size:3em}
+</style></head><body>
+<div id="st"><div id="top"><b>🏭 Misi Pabrik Cerdas</b>
+<button class="nv" onclick="go('home')">Beranda</button><button class="nv" onclick="go('guide')">Panduan</button><button class="nv" onclick="go('map')">Peta Misi</button><button class="nv" id="snd" onclick="toggleSnd()">🔊 Suara</button></div>
+<div id="v"></div><div id="ov"></div></div>
+<script>
+const $=s=>document.querySelector(s),V=$('#v'),N=5;
+let S={lv:{},cur:-1,lives:3,ls:0,t0:0,snd:true},ac;
+function fit(){const w=innerWidth,h=innerHeight,sw=Math.min(w,h*16/9),st=$('#st');st.style.width=sw+'px';st.style.height=sw*9/16+'px';st.style.fontSize=sw/64+'px'}
+addEventListener('resize',fit);fit();
+function beep(ok){if(!S.snd)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=ok?660:180;o.type=ok?'sine':'square';g.gain.value=.08;o.start();o.stop(ac.currentTime+(ok?.15:.3))}catch(e){}}
+function toggleSnd(){S.snd=!S.snd;$('#snd').textContent=S.snd?'🔊 Suara':'🔇 Senyap'}
+const total=()=>Object.values(S.lv).reduce((a,b)=>a+b,0),doneN=()=>Object.keys(S.lv).length;
+function go(p){$('#ov').innerHTML='';S.cur=-1;({home,guide,map,result,credits})[p]()}
+function home(){V.innerHTML=`<div class="hero"><div><h1>Misi Pabrik Cerdas: Koding dan Kecerdasan Artifisial</h1>
+<p class="pm">Bisakah robot memilah buah matang tanpa kamu perintah satu per satu?</p>
+<p>Halo, teman-teman! Kamu akan menjadi teknisi di pabrik pengolahan cerdas. Selesaikan 5 misi untuk melatih berpikir komputasional, menyusun algoritma, memakai percabangan dan perulangan, mengenali cara kerja kecerdasan artifisial (AI), serta mengambil keputusan etis saat memakai AI di dunia kerja. Kumpulkan skor, jaga nyawamu, dan raih bintang terbanyak!</p>
+<div class="row"><button onclick="go('guide')">▶ Mulai</button><button class="sc" onclick="go('map')">Peta Misi</button></div></div><div class="art">🤖🏭</div></div>`}
+function guide(){V.innerHTML=`<h2>📖 Panduan</h2><div class="row" style="flex:1"><div class="card" style="flex:1.4"><h2>Tujuan Belajar</h2><ul style="margin-left:1.2em"><li>Menyusun algoritma secara berurutan.</li><li>Menerapkan percabangan (jika–maka–selain itu).</li><li>Menggunakan perulangan, termasuk perulangan bersarang.</li><li>Mengenali jenis penerapan AI di dunia kerja.</li><li>Mengambil keputusan etis dalam penggunaan AI.</li></ul>
+<h2 style="margin-top:.5em">Aturan Main</h2><ul style="margin-left:1.2em"><li>Ada <b>5 level</b>; level terbuka satu per satu, tetapi level selesai boleh diulang.</li><li>Tiap level punya <b>3 nyawa ❤️</b>. Salah = nyawa berkurang.</li><li>Jawaban benar memberi skor; selesai lebih cepat memberi <b>bonus waktu</b>.</li><li>Umpan balik muncul langsung di kotak di bawah area tantangan.</li></ul></div>
+<div class="card" style="flex:1"><h2>Level</h2><ol style="margin-left:1.2em"><li>⚙️ Urutkan Algoritma</li><li>🌡️ Percabangan</li><li>🔁 Perulangan</li><li>🧠 Kenali AI</li><li>⚖️ Etika AI</li></ol></div></div>
+<div class="row" style="justify-content:space-between"><button class="nv" onclick="go('home')">◀ Kembali</button><button onclick="go('map')">Berikutnya ▶</button></div>`}
+const ICON=['⚙️','🌡️','🔁','🧠','⚖️'],NAME=['Urutkan Algoritma','Percabangan','Perulangan','Kenali AI','Etika AI'];
+function map(){V.innerHTML=`<h2>🗺️ Peta Misi</h2><p>Skor total: <b>${total()}</b> · Misi selesai: <b>${doneN()}/${N}</b> · Pilih level yang terbuka.</p><div class="lv">${NAME.map((n,i)=>{const d=S.lv[i]!==undefined,open=i==0||S.lv[i-1]!==undefined;return`<button class="${d?'done':''}" ${open?'':'disabled'} onclick="start(${i})"><span class="big">${open?ICON[i]:'🔒'}</span><span>Level ${i+1}</span><span>${n}</span><span>${d?'✔ '+S.lv[i]+' poin':open?'Siap dimainkan':'Terkunci'}</span></button>`}).join('')}</div>
+<div class="row" style="margin-top:auto;justify-content:space-between"><button class="nv" onclick="go('guide')">◀ Kembali</button><button ${doneN()==N?'':'disabled'} onclick="go('result')">Lihat Hasil ▶</button></div>`}
+function hdr(){return`<div class="hd"><span>Level ${S.cur+1} dari ${N}: ${NAME[S.cur]}</span><div class="bar"><i style="width:${doneN()/N*100}%"></i></div><span id="lf">${'❤️'.repeat(S.lives)}${'🖤'.repeat(3-S.lives)}</span><span>Skor: ${total()+S.ls}</span><button class="nv" onclick="go('map')">☰ Peta</button></div>`}
+function start(i){S.cur=i;S.lives=3;S.ls=0;S.t0=Date.now();$('#ov').innerHTML='';L[i]()}
+function frame(q,body){V.innerHTML=hdr()+`<div class="card"><b>${q}</b></div><div id="lb" style="flex:1;display:flex;flex-direction:column;gap:.6em">${body}</div><div id="fb" class="in">Ayo mulai! Umpan balik akan muncul di sini.</div>`}
+function fb(m,c){const f=$('#fb');f.className=c;f.innerHTML=m;beep(c=='ok')}
+function good(m,p=20){S.ls+=p;fb('✅ '+m+' (+'+p+')','ok')}
+function bad(m){S.lives--;S.ls=Math.max(0,S.ls-5);fb('❌ '+m+' (−5)','bad');$('#lf').textContent='❤️'.repeat(S.lives)+'🖤'.repeat(3-S.lives);if(S.lives<=0)setTimeout(()=>ov(`<div class="big">💔</div><h2>Nyawa habis</h2><p>Tidak apa-apa, teknisi hebat belajar dari kesalahan. Coba lagi!</p><div class="row" style="justify-content:center"><button onclick="start(${S.cur})">↻ Ulangi Level</button><button class="sc" onclick="go('map')">Peta Misi</button></div>`),500)}
+function ov(h){$('#ov').innerHTML=`<div class="ov"><div class="card">${h}</div></div>`}
+function fin(){const sec=(Date.now()-S.t0)/1000,bn=Math.max(0,30-Math.floor(sec/10));S.ls+=bn;S.lv[S.cur]=Math.max(S.lv[S.cur]||0,S.ls);beep(true);const nx=S.cur+1<N;
+ov(`<div class="big">🎉</div><h2>Level ${S.cur+1} selesai!</h2><p>Skor level: <b>${S.ls}</b> (bonus waktu ${bn}) · Waktu ${Math.round(sec)} detik · Nyawa tersisa ${S.lives}</p><div class="row" style="justify-content:center">${nx?`<button onclick="start(${S.cur+1})">Level ${S.cur+2} ▶</button>`:`<button onclick="go('result')">Lihat Hasil ▶</button>`}<button class="sc" onclick="go('map')">Peta Misi</button><button class="sc" onclick="start(${S.cur})">↻ Ulangi</button></div>`)}
+const sh=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+const L=[];
+/* L1 urutan */
+L[0]=()=>{const st=['Mulai','Ambil satu buah dari ban berjalan','Sensor membaca warna buah','Pisahkan ke keranjang sesuai warna','Ulangi sampai buah habis, lalu selesai'],why=['Algoritma selalu diawali dengan titik mulai.','Buah harus diambil dulu sebelum dibaca sensor.','Sensor perlu membaca warna sebelum memutuskan.','Pemisahan dilakukan setelah warna diketahui.','Perulangan dan akhir program ditempatkan terakhir.'];let seq=[],ord=sh([0,1,2,3,4]);
+const draw=()=>{$('#lb').innerHTML=`<div class="row"><div style="flex:1;display:flex;flex-direction:column;gap:.4em"><b>Urutan algoritma kamu:</b>${st.map((s,i)=>`<div class="sl ${i<seq.length?'f':''}"><b>${i+1}.</b> ${i<seq.length?st[seq[i]]:'(kosong)'}</div>`).join('')}</div><div style="flex:1;display:flex;flex-direction:column;gap:.4em"><b>Pilih langkah berikutnya:</b>${ord.filter(i=>!seq.includes(i)).map(i=>`<button class="opt" onclick="pk(${i})">${st[i]}</button>`).join('')}<div class="card" style="margin-top:auto">🍎🍏🍎🍏 ➜ 🤖 ➜ 🧺 / 🧺</div></div></div>`};
+window.pk=i=>{if(i==seq.length){seq.push(i);good(st[i]+' — '+why[i]);draw();if(seq.length==5)setTimeout(fin,900)}else bad('Belum tepat. Pikirkan: apa yang harus terjadi tepat sebelum langkah itu?')};
+frame('Misi 1: Susun algoritma mesin penyortir buah dengan memilih langkah dalam urutan yang benar.','');draw()};
+/* L2 percabangan */
+L[1]=()=>{frame('Misi 2: Atur program kipas pendingin ruang server. Kipas harus ON hanya jika suhu LEBIH dari 30°C.',`<div class="row"><div class="card" style="flex:1.2;display:flex;flex-direction:column;gap:.6em"><b>Program:</b><div>JIKA suhu <select id="op"><option>&gt;</option><option>&lt;</option><option>=</option><option>≥</option></select> 30°C MAKA kipas <select id="th"><option>ON</option><option>OFF</option></select></div><div>SELAIN ITU kipas <select id="el"><option>ON</option><option>OFF</option></select></div><button class="ac" onclick="t2()">▶ Uji 4 Skenario</button><div id="tt"></div></div><div class="card" style="flex:1;text-align:center"><b>Simulasi langsung</b><div class="big" id="fan">🌀</div><div>Suhu: <b id="tv">25</b>°C · Kipas: <b id="fs">OFF</b></div><input type="range" min="15" max="45" value="25" id="sl"></div></div>`);
+const ev=t=>{const o=$('#op').value,c=o=='>'?t>30:o=='<'?t<30:o=='='?t==30:t>=30;return c?$('#th').value:$('#el').value};
+const up=()=>{const t=+$('#sl').value,r=ev(t);$('#tv').textContent=t;$('#fs').textContent=r;$('#fan').style.opacity=r=='ON'?1:.3};['sl','op','th','el'].forEach(i=>$('#'+i).oninput=up);up();
+window.t2=()=>{let ok=true,h='<table><tr><th>Suhu</th><th>Seharusnya</th><th>Hasil programmu</th></tr>';[20,30,35,42].forEach(t=>{const e=t>30?'ON':'OFF',r=ev(t),g=e==r;ok=ok&&g;h+=`<tr><td>${t}°C</td><td>${e}</td><td>${r} ${g?'✔':'✘'}</td></tr>`});$('#tt').innerHTML=h+'</table>';ok?(good('Semua skenario lolos! Perhatikan suhu tepat 30°C: kondisi “>” tidak menyalakan kipas.',40),setTimeout(fin,1500)):bad('Ada skenario yang gagal. Cek tanda ✘, lalu perbaiki operator atau aksi.')}};
+/* L3 perulangan */
+L[2]=()=>{let r=0;const boxes=(n)=>'<span class="bx"></span>'.repeat(n);
+const draw=()=>{$('#lb').innerHTML=r==0?`<div class="card">Ronde 1/2 — Robot harus menumpuk <b>6 kotak</b> di palet.<br>ULANGI <input type="number" id="n1" min="0" max="12" value="1" style="width:5em"> kali: letakkan 1 kotak <button class="ac" onclick="r1()">▶ Jalankan</button></div><div class="card" id="pv" style="min-height:4em">Palet kosong</div>`:`<div class="card">Ronde 2/2 — Susun <b>3 baris</b>, tiap baris berisi <b>4 kotak</b> (perulangan bersarang).<br>ULANGI <input type="number" id="a" min="0" max="6" value="1" style="width:5em"> baris: ULANGI <input type="number" id="b" min="0" max="8" value="1" style="width:5em"> kotak <button class="ac" onclick="r2()">▶ Jalankan</button></div><div class="card" id="pv" style="min-height:4em">Palet kosong</div>`};
+window.r1=()=>{const n=+$('#n1').value;$('#pv').innerHTML=boxes(n)+` <b>(${n} kotak)</b>`;n==6?(good('Tepat 6 kali perulangan = 6 kotak.'),r=1,setTimeout(draw,1500)):bad(n<6?'Kotak kurang '+(6-n)+'. Tambah jumlah ulangan.':'Kotak berlebih '+(n-6)+'. Kurangi jumlah ulangan.')};
+window.r2=()=>{const a=+$('#a').value,b=+$('#b').value;$('#pv').innerHTML=Array.from({length:a},()=>'<div>'+boxes(b)+'</div>').join('')+`<b>${a} baris × ${b} kotak = ${a*b}</b>`;a==3&&b==4?(good('Perulangan luar = baris, perulangan dalam = kotak per baris.',40),setTimeout(fin,1500)):bad(a*b==12?'Jumlahnya 12, tetapi susunannya harus 3 baris × 4 kotak.':'Hasil '+a*b+' kotak, targetnya 12 (3 baris × 4 kotak).')};
+frame('Misi 3: Robot palet hanya boleh memakai perulangan, bukan menulis perintah berulang-ulang.','');draw()};
+/* L4 cocokkan */
+L[3]=()=>{const cs=['Kamera gerbang membuka pintu setelah mengenali wajah karyawan','Aplikasi memperkirakan stok bahan besok dari data penjualan','Chatbot hotel menjawab pertanyaan tamu lewat teks','Lampu menyala dari perintah ucapan “nyalakan lampu”'],ty=['Visi komputer','Prediksi data','Pemrosesan bahasa','Pengenalan suara'];let sel=-1,dn=[];const ty2=sh([0,1,2,3]);
+const draw=()=>{$('#lb').innerHTML=`<div class="row"><div style="flex:1.3;display:flex;flex-direction:column;gap:.4em"><b>Kasus di dunia kerja:</b>${cs.map((c,i)=>`<button class="opt ${dn.includes(i)?'dn':sel==i?'sel':''}" ${dn.includes(i)?'disabled':''} onclick="sc(${i})">${c}</button>`).join('')}</div><div style="flex:1;display:flex;flex-direction:column;gap:.4em"><b>Jenis penerapan AI:</b>${ty2.map(i=>`<button class="opt ${dn.includes(i)?'dn':''}" ${dn.includes(i)?'disabled':''} onclick="tc(${i})">${ty[i]}</button>`).join('')}</div></div>`};
+window.sc=i=>{sel=i;fb('Kasus dipilih. Sekarang klik jenis AI yang cocok.','in');draw()};
+window.tc=i=>{if(sel<0)return fb('Pilih kasus di kolom kiri dahulu.','in');if(sel==i){dn.push(i);sel=-1;good('Cocok! '+ty[i]+' dipakai pada kasus tersebut.');draw();if(dn.length==4)setTimeout(fin,900)}else bad('Kurang cocok. Perhatikan jenis data masukannya: gambar, angka, teks, atau suara?')};
+frame('Misi 4: Cocokkan kasus di pabrik dan kantor dengan jenis kecerdasan artifisial yang dipakai.','');draw()};
+/* L5 etika */
+L[4]=()=>{const q=[['Model AI seleksi pelamar dilatih dari data lama yang mayoritas satu jenis kelamin dan sering menolak pelamar lain. Apa langkah terbaik?',['Tetap dipakai karena cepat','Tambah data yang beragam dan uji kewajaran hasilnya','Hapus semua pelamar yang ditolak'],1,'Data latih yang timpang menghasilkan bias. Data beragam dan pengujian membuat keputusan lebih adil.'],
+['Kamu ingin melatih AI dengan foto karyawan dari arsip. Apa yang sebaiknya dilakukan?',['Minta izin dan lindungi data pribadi','Unggah semua foto ke layanan gratis','Pakai saja, toh sudah ada di arsip'],0,'Data pribadi dilindungi UU PDP. Izin dan keamanan data wajib.'],
+['AI asisten menyarankan setelan mesin yang tampak janggal dan bisa berbahaya. Apa tindakanmu?',['Ikuti karena AI pasti benar','Abaikan semua saran AI selamanya','Periksa dengan SOP dan teknisi senior sebelum dijalankan'],2,'AI bisa keliru. Manusia tetap bertanggung jawab memverifikasi keputusan berisiko.']];let i=0;
+const draw=()=>{const c=q[i];$('#lb').innerHTML=`<div class="card"><b>Kasus ${i+1} dari 3</b><p>${c[0]}</p></div>`+c[1].map((o,k)=>`<button class="opt" onclick="ch(${k})">${o}</button>`).join('')};
+window.ch=k=>{if(k==q[i][2]){good(q[i][3],25);i++;i<3?setTimeout(draw,1800):setTimeout(fin,1800)}else bad('Pilihan ini berisiko. Pikirkan keadilan, privasi, dan tanggung jawab manusia.')};
+frame('Misi 5: Ambil keputusan etis sebagai teknisi yang memakai AI di tempat kerja.','');draw()};
+function result(){const t=total(),st=t>=520?3:t>=380?2:1;V.innerHTML=`<h2>🏆 Hasil Akhir</h2><div class="row"><div class="card" style="flex:1;text-align:center"><div class="big">${'⭐'.repeat(st)}${'☆'.repeat(3-st)}</div><h1>${t}</h1><p>Total skor · ${doneN()} dari ${N} misi selesai</p></div><div class="card" style="flex:1.5"><b>Rincian kompetensi:</b><table style="width:100%;margin-top:.4em">${NAME.map((n,i)=>`<tr><td style="text-align:left">${ICON[i]} ${n}</td><td>${S.lv[i]!==undefined?S.lv[i]+' poin ✔':'Belum'}</td></tr>`).join('')}</table><p style="margin-top:.5em">${st==3?'Luar biasa! Kamu siap menjadi teknisi pabrik cerdas.':st==2?'Bagus! Ulangi level yang skornya masih rendah untuk meraih bintang penuh.':'Semangat! Ulangi misi dan perhatikan umpan balik untuk memperbaiki skor.'}</p></div></div>
+<div class="row" style="margin-top:auto;justify-content:space-between"><button class="nv" onclick="go('map')">◀ Peta Misi</button><button onclick="go('credits')">Informasi Kreator ▶</button></div>`}
+function credits(){V.innerHTML=`<h2>ℹ️ Informasi Kreator</h2><div class="card"><p>Kreator: <b>[Tulis nama kreator, boleh disertai gelar]</b></p><p>Organisasi: <b>[Tulis nama sekolah/instansi]</b></p><p>Semua visual memakai emoji sistem dan elemen CSS buatan pengembang. Efek suara dibuat langsung dengan Web Audio. Tidak ada aset eksternal.</p></div><div class="row" style="margin-top:auto"><button class="nv" onclick="go('result')">◀ Kembali</button><button onclick="go('home')">Beranda</button></div>`}
+home();
+</script></body></html>
